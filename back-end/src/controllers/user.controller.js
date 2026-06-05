@@ -2,7 +2,7 @@ import usermodel from '../models/user.model.js'
 import asyncHandler from 'express-async-handler'
 import bcrypt from 'bcryptjs'
 
-const register = asyncHandler(async (req, res) => {
+ export const register = asyncHandler(async (req, res) => {
     const { fullName, email, password, role } = req.body
     // validate
     if (!fullName || !email || !password) {
@@ -43,5 +43,4 @@ const register = asyncHandler(async (req, res) => {
     })
 })
 
-export default register
 
