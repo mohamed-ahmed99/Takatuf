@@ -51,6 +51,7 @@ app.use((err, req, res, next) => {
     return res.status(500).send({status:'fail', message:err.message, data: null})
 })
 
+
 // Development server
 if (process.env.NODE_ENV !== 'production') { 
   const Port = process.env.PORT || 5000
@@ -59,3 +60,5 @@ if (process.env.NODE_ENV !== 'production') {
 
 // when deploy on vercel 
 export default app   
+
+
