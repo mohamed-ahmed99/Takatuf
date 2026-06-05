@@ -3,11 +3,9 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import ConnectDB from './config/connectDB.js'
-
+import userRouter from './routes/user.router.js'
 
 // routes
-
-
 const app = express() 
 app.set('trust proxy', true); // for get real ip
 
@@ -40,8 +38,7 @@ app.get('/', async(req, res) => {
 
 
 //////////// use routes
-
-
+app.use('/api/users', userRouter)
 
 // not found routes
 app.use((req, res) => {
