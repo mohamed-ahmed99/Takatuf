@@ -1,6 +1,7 @@
 import usermodel from '../models/user.model.js'
 import asyncHandler from 'express-async-handler'
 import bcrypt from 'bcryptjs'
+import jwt from "jsonwebtoken"
 
  export const register = asyncHandler(async (req, res) => {
     const { fullName, email, password, role } = req.body
@@ -12,6 +13,7 @@ import bcrypt from 'bcryptjs'
             data: null
         })
     }
+
     // check if user exists
     const existUser = await usermodel.findOne({ email })
     if (existUser) {
@@ -32,15 +34,29 @@ import bcrypt from 'bcryptjs'
         password: hashedPassword,
         role
     })
+// token
+      const token = jwt.sign(
+        { id: user._id, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: "7d" }
+    )
+    // cookie
 
-    res.status(201).json({
+
+ res.cookie("token", token, {
+        httpOnly: true,
+        secure: false, // true في production (https)
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000
+    })
+
+    return res.status(201).json({
         status: 'success',
         message: 'User registered successfully.',
         data: {
             id: user._id,
-            email: user.email
+            email: user.email,
+            token // optional
         }
     })
 })
-
-
