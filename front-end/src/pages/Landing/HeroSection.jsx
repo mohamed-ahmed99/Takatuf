@@ -1,6 +1,8 @@
+import { useNavigate } from "react-router-dom"
 import Button from "../../components/Button"
 
 function HeroSection() {
+  const navigate = useNavigate()
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-primary via-[#0a3d5e] to-[#0d4f6e] pt-[72px]">
       {/* Animated mesh gradient background */}
@@ -63,10 +65,10 @@ function HeroSection() {
 
         {/* CTA Buttons */}
         <div className="flex items-center justify-center gap-4 flex-wrap mb-20 animate-fade-up [animation-delay:450ms] [animation-fill-mode:both]">
-          <Button variant="secondary" size="xl" className="shadow-xl shadow-secondary/20">
+          <Button variant="secondary" size="xl" className="shadow-xl shadow-secondary/20" onClick={() => navigate("/auth?tab=signup")}>
             انضم كمتبرع
           </Button>
-          <Button variant="outline-secondary" size="xl">
+          <Button variant="outline-secondary" size="xl" onClick={() => navigate("/auth?tab=signup")}>
             أنا محتاج
           </Button>
         </div>

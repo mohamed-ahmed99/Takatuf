@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import Button from "./Button"
 import { IconMenu } from "./Icons"
 
 function Navbar() {
+  const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
@@ -62,8 +64,8 @@ function Navbar() {
             ))}
           </ul>
           <div className="flex items-center gap-2 max-lg:justify-center">
-            <Button variant={scrolled ? "ghost" : "ghost"} size="sm">دخول</Button>
-            <Button variant="primary" size="sm">إنشاء حساب</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>دخول</Button>
+            <Button variant="primary" size="sm" onClick={() => navigate("/auth?tab=signup")}>إنشاء حساب</Button>
           </div>
         </div>
       </div>
