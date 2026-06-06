@@ -11,15 +11,12 @@ export const protect = asyncHandler(async (req, res, next) => {
             data: null
         });
     }
-
     try {
         const decoded = jwt.verify(
             token,
             process.env.JWT_SECRET
         );
-
         req.user = decoded;
-
         next();
     } catch (error) {
         return res.status(401).json({
@@ -29,7 +26,6 @@ export const protect = asyncHandler(async (req, res, next) => {
         });
     }
 });
-
 export const adminOnly = (req, res, next) => {
     if (req.user.role !== "admin") {
         return res.status(403).json({
@@ -41,4 +37,5 @@ export const adminOnly = (req, res, next) => {
 
     next();
 };
+
 

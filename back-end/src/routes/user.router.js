@@ -7,7 +7,7 @@ import {
   login,
   updateUser,
   partialUpdateUser
-} from "../controllers/auth.controller.js";
+} from "../controllers/login.controller.js";
 ;
 // Auth
 router.post("/register", register);
@@ -18,15 +18,5 @@ router.put("/users/:id", updateUser);
 router.patch("/users/:id", partialUpdateUser);
 
 export default router;
-
-
-
-
-
-
-
-
-
-
 
 
