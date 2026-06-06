@@ -36,9 +36,10 @@ app.get('/', async(req, res) => {
     return res.status(200).json({status:'success', message:"hello in Takatuf Server", data: null})
 })
 
+/////////////// routes
+app.use('/api/users', userRouter) // 
 
-//////////// use routes
-app.use('/api/users', userRouter)
+
 
 // not found routes
 app.use((req, res) => {

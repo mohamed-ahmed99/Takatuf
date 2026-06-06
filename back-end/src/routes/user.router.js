@@ -2,21 +2,16 @@ import express from "express";
 
 const router = express.Router();
 
-import {
-  register,
-  login,
-  updateUser,
-  partialUpdateUser
-} from "../controllers/login.controller.js";
-;
+import {register} from "../controllers/signup.controller.js";
+import {login} from "../controllers/login.controller.js";
+
+
 // Auth
 router.post("/register", register);
 router.post("/login", login);
 
-// User
-router.put("/users/:id", updateUser);
-router.patch("/users/:id", partialUpdateUser);
 
 export default router;
 
 
+  
