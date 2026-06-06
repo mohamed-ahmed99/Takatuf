@@ -1,21 +1,14 @@
-
-import usermodel from '../models/user.model.js'
 import asyncHandler from 'express-async-handler'
 import bcrypt from 'bcryptjs'
 import jwt from "jsonwebtoken"
+import accountModel from '../../../models/account.model.js'
 
-export const register = asyncHandler(async (req, res) => {
-    const { fullName, email, password, role } = req.body
-    // validate
-    if (!fullName || !email || !password) {
-        return res.status(400).json({
-            status: 'fail',
-            message: 'Please provide all required fields.',
-            data: null
-        })
-    }
+
+export const createUserAccount = asyncHandler(async (req, res) => {
+    const { fullName, email, password } = req.body
+    
     // check if user exists
-    const existUser = await usermodel.findOne({ email })
+    const existUser = await userModel.findOne({ email })
     if (existUser) {
         return res.status(400).json({
             status: 'fail',
@@ -28,13 +21,16 @@ export const register = asyncHandler(async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt)
 
     // create user
-    const user = await usermodel.create({
+    const user = await userModel.create({
         fullName,
         email,
         password: hashedPassword,
-        role
+        phoneNumber,
+        gender,
+        location,
+        accountType
     })
-// token
+    // token
       const token = jwt.sign(
         { id: user._id, role: user.role },
         process.env.JWT_SECRET,
