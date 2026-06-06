@@ -1,7 +1,5 @@
 import mongoose from "mongoose"
 
-
-
 const ConnectDB = async () => {
     try{
         mongoose.set('strictQuery', false)
@@ -16,3 +14,7 @@ const ConnectDB = async () => {
 }
 
 export default ConnectDB
+
+
+
+

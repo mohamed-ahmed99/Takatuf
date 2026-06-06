@@ -4,19 +4,29 @@ const router = express.Router();
 
 import {
   register,
-//   login,
-//   logout,
-//   getProfile
+  login,
+  updateUser,
+  partialUpdateUser
 } from "../controllers/user.controller.js";
 ;
 // Auth
 router.post("/register", register);
-// router.get("/",getProfile);
-// router.post("/login", login);
-// router.post("/logout", logout);
+router.post("/login", login);
 
 // User
-// router.get("/profile", verifyToken, getProfile);
+router.put("/users/:id", updateUser);
+router.patch("/users/:id", partialUpdateUser);
 
 export default router;
+
+
+
+
+
+
+
+
+
+
+
 
