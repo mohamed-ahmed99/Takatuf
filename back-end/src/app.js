@@ -3,7 +3,9 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import ConnectDB from './config/connectDB.js'
-import userRouter from './routes/user.router.js'
+
+// import routes
+import authRouter from './routes/auth.routes.js'
 
 // routes
 const app = express() 
@@ -37,8 +39,7 @@ app.get('/', async(req, res) => {
 })
 
 /////////////// routes
-app.use('/api/users', userRouter) // 
-
+app.use('/api/v1/auth', authRouter)
 
 
 // not found routes

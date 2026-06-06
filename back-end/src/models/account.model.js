@@ -12,10 +12,10 @@ const accountSchema = new mongoose.Schema({
     password: { type: String, required: true, select: false },
 
     // role
-    role: { type: String, enum:["user", "charity", "system_admin"], required: true, },
+    role: { type: String, enum:["user", "charity", "system_admin"], default: "user"},
 
     // account type
-    accountType: { type: String, enum: ["user", "charity"], required: true },
+    accountType: { type: String, enum: ["user", "charity"], default: "user" },
 
     // status
     status: { type: String, enum: ["active", "unverified", "banned", "deleted"], default: "unverified" },

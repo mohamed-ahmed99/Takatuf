@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs'
 import jwt from "jsonwebtoken"
 import accountModel from '../../../models/account.model.js'
 import dotenv from 'dotenv'
-import transporter from '../../../config/transporter.js'
+import emailTransporter from '../../../config/emailTransporter.js' 
 import { verifyEmailMSG } from '../../../utils/verifyEmailMSG.js'
 
 dotenv.config()
@@ -13,7 +13,7 @@ export const createAccount = asyncHandler(async (req, res) => {
 
     // check if this email connected with an active account or not
     const account = await accountModel
-        .findOne({ email: req.body.email })
+        .findOne({ email: req.body.account.email })
         .sort({ createdAt: -1 })
 
     // if there is an account connected with this email
@@ -33,18 +33,25 @@ export const createAccount = asyncHandler(async (req, res) => {
     }
 
     // hash password, create verification code
-    req.body.account.password = await bcrypt.hash(req.body.account.password, 10)
+    const hashedPassword = await bcrypt.hash(req.body.account.password, 10)
     const verificationCode = Math.floor(Math.random() * 900000 + 100000).toString()
 
     // create account
-    const newAccount = await accountModel.create({ ...req.account, verification: { verificationCode } })
+    const newAccount = await accountModel.create({ 
+        fullName: req.body.account.fullName,
+        email: req.body.account.email,
+        password: hashedPassword,
+        role: req.body.account.role,
+        accountType: req.body.account.accountType,
+        verification: { verificationCode } 
+    })
 
     // create profile of account
 
 
     // send code to user
     try {
-        await transporter.sendMail({
+        await emailTransporter.sendMail({
             from: process.env.EMAIL_FROM,
             to: req.body.account.email,
             subject: "Verify Your Account",
