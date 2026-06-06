@@ -7,7 +7,7 @@ import {
   login,
   updateUser,
   partialUpdateUser
-} from "../controllers/user.controller.js";
+} from "../controllers/auth.controller.js";
 ;
 // Auth
 router.post("/register", register);
