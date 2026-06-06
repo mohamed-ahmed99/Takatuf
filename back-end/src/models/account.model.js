@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 
 // schema
 const accountSchema = new mongoose.Schema({
+    // full name
+    fullName: { type: String, required: true },
+
     // email
     email: { type: String, required: true},
 
@@ -19,7 +22,7 @@ const accountSchema = new mongoose.Schema({
 
     // verification field
     verification: {
-      code: { type: String, required: true },
+      verificationCode: { type: String, required: true },
       expiresAt: { type: Date,  default: () => (Date.now() + 10 * 60 * 1000 )},
     },
 
