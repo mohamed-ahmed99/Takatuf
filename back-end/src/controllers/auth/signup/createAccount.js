@@ -6,6 +6,7 @@ import dotenv from 'dotenv'
 import emailTransporter from '../../../config/emailTransporter.js'
 import { verifyEmailMSG } from '../../../utils/verifyEmailMSG.js'
 import { uploadToCloudinary } from '../../../utils/uploadToCloudinary.js'
+import userModel from '../../../models/user.model.js'
 
 dotenv.config()
 
@@ -69,7 +70,6 @@ export const createAccount = asyncHandler(async (req, res) => {
 
     // create account
     const newAccount = await accountModel.create({
-        fullName: req.body.fullName,
         email: req.body.email,
         password: hashedPassword,
         accountType: req.body.accountType,
@@ -77,7 +77,26 @@ export const createAccount = asyncHandler(async (req, res) => {
     })
 
     // create profile of account
-
+    if (req.body.accountType === "user") {
+       await userModel.create({
+            accountId: newAccount._id, // reference
+            fullName: req.body.fullName, // full name
+            phoneNumber: req.body.phoneNumber, // phone number
+            dateOfBirth: req.body.dateOfBirth, // date of birth
+            gender: req.body.gender, // gender
+            address: {
+                governorate: req.body.governorate, // governorate
+                city: req.body.city, // city
+                district: req.body.district || null, // district (optional)
+            },
+            // images
+            profileImage: {url: uploadedProfileImage.url, id: uploadedProfileImage.public_id}, // profile image
+            coverImage: {url: uploadedCoverImage.url, id: uploadedCoverImage.public_id}, // cover image
+        })
+    }
+    // create charity profile 
+    else if (req.body.accountType === "charity") {
+    }
 
     // send code to user
     try {
@@ -111,7 +130,8 @@ export const createAccount = asyncHandler(async (req, res) => {
     // response
     res.status(201).json({
         status: "success",
-        message: "successful registration, check your email"
+        message: "successful registration, check your email",
+        action: "verify_email"
     })
 })
 

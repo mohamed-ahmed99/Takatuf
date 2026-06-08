@@ -2,9 +2,6 @@ import mongoose from "mongoose";
 
 // schema
 const accountSchema = new mongoose.Schema({
-    // full name
-    fullName: { type: String, required: true },
-
     // email
     email: { type: String, required: true},
 
