@@ -3,17 +3,28 @@ import bcrypt from 'bcryptjs'
 import jwt from "jsonwebtoken"
 import accountModel from '../../../models/account.model.js'
 import dotenv from 'dotenv'
-import emailTransporter from '../../../config/emailTransporter.js' 
+import emailTransporter from '../../../config/emailTransporter.js'
 import { verifyEmailMSG } from '../../../utils/verifyEmailMSG.js'
+import { uploadToCloudinary } from '../../../utils/uploadToCloudinary.js'
 
 dotenv.config()
 
 
+// fields for upload on sign-up route
+export const requestedFields = [
+    { name: "profileImage", maxCount: 1 },
+    { name: "coverImage", maxCount: 1 },
+    { name: "document", maxCount: 1 }
+]
+
+
 export const createAccount = asyncHandler(async (req, res) => {
+    console.log(req.body)
+    console.log(req.files)
 
     // check if this email connected with an active account or not
     const account = await accountModel
-        .findOne({ email: req.body.account.email })
+        .findOne({ email: req.body.email })
         .sort({ createdAt: -1 })
 
     // if there is an account connected with this email
@@ -28,22 +39,41 @@ export const createAccount = asyncHandler(async (req, res) => {
         }
         // if unverified
         else if (account.status === "unverified" && account.verification.expiresAt > Date.now()) {
-            return res.status(400).json({ status: "fail", message: "This email is connected with an unverified account, please verify this email or wait for 10 minutes to try again" })
+            return res.status(400).json({
+                status: "fail",
+                action: "verify_email",
+                message: "This email is connected with an unverified account, please verify this email or wait for 10 minutes to try again",
+            })
         }
     }
 
+
+    // check required files
+    const profileImage = req.files?.profileImage ? req.files.profileImage[0] : null
+    const coverImage = req.files?.coverImage ? req.files.coverImage[0] : null
+    const document = req.files?.document ? req.files.document[0] : null
+
+    // upload profile and cover images
+    const uploadedProfileImage = await uploadToCloudinary(profileImage.buffer, "profileImages")
+    const uploadedCoverImage = await uploadToCloudinary(coverImage.buffer, "coverImages")
+
+    // upload document if the accountType === "charity"
+    let uploadedDocument = null
+    if (req.body.accountType === "charity") {
+        uploadedDocument = await uploadToCloudinary(document.buffer, "documents")
+    }
+
     // hash password, create verification code
-    const hashedPassword = await bcrypt.hash(req.body.account.password, 10)
+    const hashedPassword = await bcrypt.hash(req.body.password, 10)
     const verificationCode = Math.floor(Math.random() * 900000 + 100000).toString()
 
     // create account
-    const newAccount = await accountModel.create({ 
-        fullName: req.body.account.fullName,
-        email: req.body.account.email,
+    const newAccount = await accountModel.create({
+        fullName: req.body.fullName,
+        email: req.body.email,
         password: hashedPassword,
-        role: req.body.account.role,
-        accountType: req.body.account.accountType,
-        verification: { verificationCode } 
+        accountType: req.body.accountType,
+        verification: { verificationCode },
     })
 
     // create profile of account
@@ -53,7 +83,7 @@ export const createAccount = asyncHandler(async (req, res) => {
     try {
         await emailTransporter.sendMail({
             from: process.env.EMAIL_FROM,
-            to: req.body.account.email,
+            to: req.body.email,
             subject: "Verify Your Account",
             html: verifyEmailMSG(`${newAccount.fullName}`, verificationCode)
         })
@@ -61,7 +91,7 @@ export const createAccount = asyncHandler(async (req, res) => {
         console.log(error)
         return res.status(500).json({ status: "fail", message: "Failed to send verification email" })
     }
-    
+
     // create token for verify email
     const token = jwt.sign({ _id: newAccount._id, email: newAccount.email }, process.env.JWT_SECRET, { expiresIn: "10m" })
 
@@ -79,18 +109,9 @@ export const createAccount = asyncHandler(async (req, res) => {
     // await Sessions.create({ user: newAccount._id, token, ip: req.ip, expiresAt: new Date(Date.now() + 1000 * 60 * 10) })
 
     // response
-    res.status(201).json({ 
+    res.status(201).json({
         status: "success",
-        message: "successful registration, check your email" 
+        message: "successful registration, check your email"
     })
 })
-
-
-
-
-
-
-
-
-
 
