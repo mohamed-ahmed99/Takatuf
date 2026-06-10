@@ -3,59 +3,71 @@ import useScrollReveal from "../../hooks/useScrollReveal"
 import { IconUsers, IconBuilding, IconCheckCircle, IconFileText } from "../../components/Icons"
 
 const stats = [
-  { icon: IconUsers, number: "+١٢٠", label: "مستفيد" },
-  { icon: IconBuilding, number: "+٨", label: "جمعية خيرية" },
-  { icon: IconCheckCircle, number: "+٤٠", label: "تبرع مكتمل" },
-  { icon: IconFileText, number: "+١٥", label: "بوست منشور" },
+  { icon: IconUsers, number: "+١٢٠", label: "مستفيد ساعدناه", prefix: "فرد" },
+  { icon: IconBuilding, number: "+٨", label: "جمعية شغالة معانا", prefix: "مؤسسة" },
+  { icon: IconCheckCircle, number: "+٤٠", label: "تبرع وصل للي يستحقه", prefix: "حالة" },
+  { icon: IconFileText, number: "+١٥", label: "طلب مساعدة", prefix: "طلب" },
 ]
 
 function StatisticsSection() {
   const [ref, visible] = useScrollReveal(0.05)
 
   return (
-    <section id="statistics" className="py-28 px-6 relative overflow-hidden bg-gradient-to-br from-primary via-[#0a3d5e] to-primary">
-      {/* Animated background particles */}
+    <section id="statistics" className="py-24 md:py-32 px-6 relative overflow-hidden bg-primary-dark">
+      {/* Animated Deep Background */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-[10%] w-40 h-40 bg-secondary/5 rounded-full blur-2xl animate-float-slow" />
-        <div className="absolute bottom-1/4 right-[10%] w-60 h-60 bg-secondary/5 rounded-full blur-3xl animate-float-medium" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-white/3 rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--color-primary-light)_0%,_transparent_70%)] opacity-30"></div>
+        
+        {/* Floating Particles/Blobs */}
+        <div className="absolute top-[20%] left-[15%] w-[30vw] h-[30vw] rounded-full bg-secondary-dark/10 blur-[80px] animate-blob mix-blend-screen" style={{ animationDuration: '10s' }}></div>
+        <div className="absolute bottom-[10%] right-[10%] w-[40vw] h-[40vw] rounded-full bg-accent/5 blur-[100px] animate-blob mix-blend-screen" style={{ animationDelay: '4s', animationDuration: '12s' }}></div>
       </div>
 
-      {/* Light grid overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-        }}
-      />
-
       <div ref={ref} className="max-w-[1200px] mx-auto relative z-10">
-        <SectionTitle
-          title="تكاتف بالأرقام"
-          subtitle="كل رقم هنا بيعبر عن أثر حقيقي في حياة ناس"
-          light
-        />
+        <div className="text-center mb-20 animate-fade-up">
+          <SectionTitle
+            title={<span className="text-4xl md:text-5xl font-black text-white">تكاتف بالأرقام</span>}
+            subtitle={<span className="text-lg text-white/70 mt-4 block">كل رقم هنا بيعبر عن قصة حقيقية غيرت حياة حد للأحسن</span>}
+            light
+          />
+        </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 lg:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {stats.map((s, i) => {
             const Icon = s.icon
             return (
               <div
                 key={i}
-                className={`text-center p-6 lg:p-8 bg-white/5 backdrop-blur-xl border border-white/8 rounded-2xl hover:bg-white/10 hover:-translate-y-2 hover:shadow-2xl hover:shadow-secondary/10 transition-all duration-500 group ${
-                  visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+                className={`group relative ${
+                  visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-16"
                 }`}
-                style={{ transitionDelay: `${i * 150}ms` }}
+                style={{ transition: `all 1s cubic-bezier(0.16, 1, 0.3, 1) ${i * 150}ms` }}
               >
-                <div className="inline-flex items-center justify-center w-14 h-14 bg-white/8 text-secondary rounded-xl mb-5 group-hover:scale-110 group-hover:bg-secondary/15 transition-all duration-400">
-                  <Icon className="w-7 h-7" />
+                {/* Background Glow on Hover */}
+                <div className="absolute -inset-0.5 bg-gradient-to-br from-secondary/30 to-transparent rounded-3xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                
+                {/* Glass Card */}
+                <div className="relative h-full flex flex-col items-center justify-center p-8 lg:p-10 glass-panel-dark rounded-3xl border border-white/10 group-hover:border-secondary/30 group-hover:-translate-y-2 transition-all duration-500 overflow-hidden">
+                  
+                  {/* Subtle Inner Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                  <div className="relative z-10 flex flex-col items-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-white/5 text-secondary rounded-2xl mb-6 group-hover:scale-110 group-hover:bg-secondary/10 group-hover:text-white transition-all duration-500 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
+                      <Icon className="w-8 h-8 drop-shadow-md" />
+                    </div>
+                    
+                    <div className="flex items-baseline gap-2 mb-2">
+                      <span className="block text-4xl md:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-br from-white to-white/70 tracking-tight group-hover:from-secondary group-hover:to-white transition-all duration-500">
+                        {s.number}
+                      </span>
+                    </div>
+                    
+                    <span className="text-sm md:text-base font-medium text-white/50 group-hover:text-white/80 transition-colors duration-300 text-center">
+                      {s.label}
+                    </span>
+                  </div>
                 </div>
-                <span className="block text-3xl md:text-4xl font-black text-secondary mb-1 tracking-tight">
-                  {s.number}
-                </span>
-                <span className="text-sm text-white/60">{s.label}</span>
               </div>
             )
           })}

@@ -1,5 +1,4 @@
 import SectionTitle from "../../components/SectionTitle"
-import Card from "../../components/Card"
 import { IconQuote } from "../../components/Icons"
 import useScrollReveal from "../../hooks/useScrollReveal"
 
@@ -7,20 +6,20 @@ const testimonials = [
   {
     quote:
       "كنت محتاج لابتوب عشان أذاكر عليه في الثانوية العامة. نزلت طلب في تكاتف، وفي خلال أسبوع الجمعية كلمتني ووصلتلي الجهاز. الحمد لله.",
-    name: "أحمد",
+    name: "أحمد منصور",
     role: "طالب ثانوية عامة",
   },
   {
     quote:
-      "كان عندي كرسي مكتب قديم مش بستخدمه. فكرت أتبرع بيه، نزلته في تكاتف ووصل لأسرة محتاجة. أحساس جميل إنك تعرف إن حاجة بسيطة زي كدة فرحت ناس.",
-    name: "سارة",
-    role: "متبرعة",
+      "كان عندي كرسي مكتب قديم مش بستخدمه. فكرت أتبرع بيه، نزلته في تكاتف ووصل لأسرة محتاجة. إحساس جميل إنك تعرف إن حاجة بسيطة زي كدة فرحت ناس بجد.",
+    name: "سارة عبد الرحمن",
+    role: "متبرعة نشطة",
   },
   {
     quote:
-      "الجمعية بتاعتنا انضمت لتكاتف ولقينا ناس كتير عايزة تساعد. المنصة سهلة وسريعة وبتوصل التبرعات لمستحقيها بكل شفافية.",
-    name: "م. خالد",
-    role: "ممثل جمعية خيرية",
+      "الجمعية بتاعتنا انضمت لتكاتف ولقينا ناس كتير عايزة تساعد. المنصة سهلة وسريعة وبتوصل التبرعات لمستحقيها بكل شفافية وأمان.",
+    name: "م. خالد يوسف",
+    role: "ممثل جمعية رسالة",
   },
 ]
 
@@ -28,47 +27,59 @@ function TestimonialsSection() {
   const [ref, visible] = useScrollReveal(0.05)
 
   return (
-    <section id="testimonials" className="py-28 px-6 bg-white relative overflow-hidden">
-      <div className="absolute -top-40 -right-40 w-96 h-96 bg-secondary/5 rounded-full blur-3xl" />
-      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl" />
+    <section id="testimonials" className="py-24 md:py-32 px-6 bg-bg-light relative overflow-hidden">
+      {/* Dynamic Background */}
+      <div className="absolute top-0 right-0 w-full h-full pointer-events-none overflow-hidden z-0">
+        <div className="absolute top-[20%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-secondary-light/30 blur-[120px] mix-blend-multiply opacity-60 animate-blob"></div>
+        <div className="absolute bottom-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-primary-light/20 blur-[100px] mix-blend-multiply opacity-50 animate-blob" style={{ animationDelay: '4s' }}></div>
+      </div>
 
       <div ref={ref} className="max-w-[1200px] mx-auto relative z-10">
-        <SectionTitle
-          title="قصص نجاح"
-          subtitle="ناس حقيقية، قصص حقيقية — أثر تكاتف في حياتهم"
-        />
+        <div className="text-center mb-20 animate-fade-up">
+          <SectionTitle
+            title={<span className="text-4xl md:text-5xl font-black text-primary-dark">قصص من تكاتف</span>}
+            subtitle={<span className="text-lg text-text-muted mt-4 block">حكايات حقيقية من ناس تكاتف فرقت في حياتهم</span>}
+          />
+        </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-8 lg:gap-10">
           {testimonials.map((t, i) => (
             <div
               key={i}
-              className={`transition-all duration-700 ease-out ${
-                visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+              className={`relative transition-all duration-1000 ease-out ${
+                visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-16"
               }`}
               style={{ transitionDelay: `${i * 200}ms` }}
             >
-              <Card padding="lg" className="group h-full flex flex-col hover:shadow-xl hover:shadow-black/5 relative border-0 shadow-lg shadow-black/5">
-                {/* Decorative quote mark */}
-                <div className="absolute -top-3 -right-3 w-14 h-14 bg-gradient-to-br from-secondary/20 to-secondary/5 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-400">
-                  <IconQuote className="w-5 h-5 text-secondary/30" />
+              <div className="glass-panel rounded-3xl p-8 h-full flex flex-col group hover:-translate-y-3 hover:shadow-[0_20px_50px_-15px_rgba(5,36,64,0.15)] transition-all duration-500 border border-white/80">
+                
+                {/* Large Quote Icon Watermark */}
+                <IconQuote className="absolute top-6 left-6 w-24 h-24 text-secondary/5 -z-10 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-700" />
+                
+                {/* Floating Quote Badge */}
+                <div className="absolute -top-5 right-8 w-10 h-10 bg-gradient-to-br from-secondary to-secondary-dark rounded-xl flex items-center justify-center shadow-lg shadow-secondary/30 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500 z-20">
+                  <IconQuote className="w-5 h-5 text-white drop-shadow-sm" />
                 </div>
 
-                <div className="flex-1">
-                  <p className="text-text-dark leading-relaxed text-sm mb-6 relative z-10">
-                    {t.quote}
+                <div className="flex-1 mt-4">
+                  <p className="text-text-dark leading-relaxed text-[16px] font-medium relative z-10 mb-8">
+                    "{t.quote}"
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3.5 pt-5 border-t border-border/60 mt-auto">
-                  <div className="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-primary to-primary-dark text-white font-bold rounded-xl text-sm shrink-0 shadow-md shadow-primary/20">
-                    {t.name.charAt(0)}
+                <div className="flex items-center gap-4 pt-6 border-t border-gray-200/60 mt-auto">
+                  <div className="relative">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-secondary to-primary-light rounded-2xl blur opacity-30 group-hover:opacity-70 transition duration-500"></div>
+                    <div className="w-14 h-14 flex items-center justify-center bg-white border border-gray-100 text-primary-dark font-black rounded-2xl text-xl shrink-0 relative z-10">
+                      {t.name.charAt(0)}
+                    </div>
                   </div>
                   <div>
-                    <p className="font-bold text-primary">{t.name}</p>
-                    <p className="text-xs text-text-muted">{t.role}</p>
+                    <p className="font-bold text-primary-dark text-lg group-hover:text-primary transition-colors">{t.name}</p>
+                    <p className="text-sm text-secondary-dark font-medium">{t.role}</p>
                   </div>
                 </div>
-              </Card>
+              </div>
             </div>
           ))}
         </div>

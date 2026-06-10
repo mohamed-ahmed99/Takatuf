@@ -198,3 +198,31 @@ export function IconTarget({ className = "w-5 h-5" }) {
     </svg>
   )
 }
+
+export function IconX({ className = "w-5 h-5" }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" {...s}>
+      <path d="M18 6 6 18" />
+      <path d="M6 6 18 18" />
+    </svg>
+  )
+}
+
+export function IconUpload({ className = "w-5 h-5" }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" {...s}>
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <path d="m17 8-5-5-5 5" />
+      <path d="M12 3v12" />
+    </svg>
+  )
+}
+
+export function IconCamera({ className = "w-5 h-5" }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" {...s}>
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z" />
+      <circle cx="12" cy="13" r="4" />
+    </svg>
+  )
+}
