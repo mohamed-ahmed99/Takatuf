@@ -1,12 +1,12 @@
 import asyncHandler from 'express-async-handler'
 import bcrypt from 'bcryptjs'
 import jwt from "jsonwebtoken"
-import accountModel from '../../../models/account.model.js'
+import accountModel from '../../models/account.model.js'
 import dotenv from 'dotenv'
-import emailTransporter from '../../../config/emailTransporter.js'
-import { verifyEmailMSG } from '../../../utils/verifyEmailMSG.js'
-import { uploadToCloudinary } from '../../../utils/uploadToCloudinary.js'
-import userModel from '../../../models/user.model.js'
+import emailTransporter from '../../config/emailTransporter.js'
+import { verifyEmailMSG } from '../../utils/verifyEmailMSG.js'
+import { uploadToCloudinary } from '../../utils/uploadToCloudinary.js'
+import userModel from '../../models/profiles/user.model.js'
 
 dotenv.config()
 
@@ -20,9 +20,7 @@ export const requestedFields = [
 
 
 export const createAccount = asyncHandler(async (req, res) => {
-    console.log(req.body)
-    console.log(req.files)
-
+    
     // check if this email connected with an active account or not
     const account = await accountModel
         .findOne({ email: req.body.email })
@@ -78,16 +76,16 @@ export const createAccount = asyncHandler(async (req, res) => {
 
     // create profile of account
     if (req.body.accountType === "user") {
-       await userModel.create({
+        await userModel.create({
             accountId: newAccount._id, // reference
             fullName: req.body.fullName, // full name
             phoneNumber: req.body.phoneNumber, // phone number
             dateOfBirth: req.body.dateOfBirth, // date of birth
-            gender: req.body.gender, // gender
+            gender: req.body.gender === "ذكر" || "male" ? "male" : "female", // gender
             address: {
                 governorate: req.body.governorate, // governorate
                 city: req.body.city, // city
-                district: req.body.district || null, // district (optional)
+                district: req.body.district || null, // district
             },
             // images
             profileImage: {url: uploadedProfileImage.url, id: uploadedProfileImage.public_id}, // profile image
@@ -112,7 +110,11 @@ export const createAccount = asyncHandler(async (req, res) => {
     }
 
     // create token for verify email
-    const token = jwt.sign({ _id: newAccount._id, email: newAccount.email }, process.env.JWT_SECRET, { expiresIn: "10m" })
+    const token = jwt.sign(
+        { _id: newAccount._id, email: newAccount.email },
+        process.env.JWT_SECRET,
+        { expiresIn: "10m" }
+    )
 
     // cookie for verify email
     const isProduction = process.env.NODE_ENV === "production";

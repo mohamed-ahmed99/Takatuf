@@ -2,14 +2,14 @@ import express from "express";
 
 const authRouter = express.Router();
 
-import { createAccount } from "../controllers/auth/signup/createAccount.js";
+import { createAccount } from "../controllers/auth/createAccount.js";
 // import { Login } from "../controllers/auth/Login.js";
 
 // middleware
 import upload from "../middlewares/upload.middleware.js";
 
 // fields for upload on sign-up route
-import { requestedFields } from "../controllers/auth/signup/createAccount.js";
+import { requestedFields } from "../controllers/auth/createAccount.js";
 
 
 // Auth
