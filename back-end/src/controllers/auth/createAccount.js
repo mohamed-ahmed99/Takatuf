@@ -7,6 +7,8 @@ import emailTransporter from '../../config/emailTransporter.js'
 import { verifyEmailMSG } from '../../utils/verifyEmailMSG.js'
 import { uploadToCloudinary } from '../../utils/uploadToCloudinary.js'
 import userModel from '../../models/profiles/user.model.js'
+import charityModel from '../../models/profiles/charity.model.js'
+import charityVerificationModel from '../../models/profiles/CharityVerification.model.js'
 
 dotenv.config()
 
@@ -94,6 +96,44 @@ export const createAccount = asyncHandler(async (req, res) => {
     }
     // create charity profile 
     else if (req.body.accountType === "charity") {
+
+        // create charity profile
+        await charityModel.create({
+            accountId: newAccount._id, // reference
+            charityName: req.body.charityName, // charity name
+            about: req.body.about || null, // about
+            establishmentDate: req.body.establishmentDate, // establishment date
+            address: {
+                governorate: req.body.governorate, // governorate
+                city: req.body.city, // city
+                district: req.body.district || null, // district
+            },
+            contactInfo: {
+                email: req.body.charityEmail || req.body.email, // email
+                phone: req.body.charityPhone || req.body.phone, // phone
+                socialMedia: req.body.socialMedia || []
+            },
+            // images
+            profileImage: {url: uploadedProfileImage?.url || null, id: uploadedProfileImage?.public_id || null}, // profile image
+            coverImage: {url: uploadedCoverImage?.url || null, id: uploadedCoverImage?.public_id || null}, // cover image
+        })
+
+        // create verification account for charity
+        await charityVerificationModel.create({
+            accountId: newAccount._id, // reference
+            representative: {
+                fullName: req.body.fullName, // full name
+                nationalId: req.body.nationalId, // national id
+                phone: req.body.phone, // phone number
+                email: req.body.email, // email
+                position: req.body.position, // position
+            },
+            legalInfo: {
+                registrationNumber: req.body.registrationNumber, // registration number
+                taxNumber: req.body.taxNumber, // tax number
+                verificationDocument: {url: uploadedDocument.url, id: uploadedDocument.public_id}, // verification document
+            },
+        })
     }
 
     // send code to user
