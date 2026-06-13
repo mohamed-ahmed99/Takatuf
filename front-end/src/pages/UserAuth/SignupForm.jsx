@@ -4,7 +4,6 @@ import Input from "../../components/Input"
 import Button from "../../components/Button"
 import ProfileUpload from "../../components/ProfileUpload"
 import { useToast } from "../../context/ToastContext"
-import { useAuth } from "../../context/AuthContext"
 
 function placeholderFile() {
   const canvas = document.createElement('canvas')
@@ -23,12 +22,12 @@ function placeholderFile() {
 function SignupForm() {
   const navigate = useNavigate()
   const { addToast } = useToast()
-  const { login: authLogin } = useAuth()
   const [loading, setLoading] = useState(false)
   const [files, setFiles] = useState({ profileImage: null, coverImage: null })
   const [form, setForm] = useState({
-    fullName: "", email: "", phoneNumber: "", password: "", confirmPassword: "",
+    fullName: "", email: "", phone: "", password: "", confirmPassword: "",
     type: "donor", dateOfBirth: "", gender: "", governorate: "", city: "", district: "",
+    nationalId: "",
   })
   const [errors, setErrors] = useState({})
 
@@ -50,7 +49,8 @@ function SignupForm() {
     const newErrors = {}
     if (!form.fullName.trim()) newErrors.fullName = "الاسم الكامل مطلوب"
     if (!form.email.trim()) newErrors.email = "البريد الإلكتروني مطلوب"
-    if (!form.phoneNumber.trim()) newErrors.phoneNumber = "رقم الهاتف مطلوب"
+    if (!form.phone.trim()) newErrors.phone = "رقم الهاتف مطلوب"
+    if (!form.nationalId.trim()) newErrors.nationalId = "الرقم القومي مطلوب"
     if (!form.gender) newErrors.gender = "يرجى اختيار الجنس"
     if (!form.password.trim()) newErrors.password = "كلمة المرور مطلوبة"
     if (form.password.length < 6) newErrors.password = "كلمة المرور يجب أن تكون 6 أحرف على الأقل"
@@ -62,11 +62,13 @@ function SignupForm() {
       const formData = new FormData()
       formData.append("fullName", form.fullName)
       formData.append("email", form.email)
-      formData.append("phoneNumber", form.phoneNumber)
+      formData.append("phone", form.phone)
+      formData.append("phoneNumber", form.phone)
       formData.append("password", form.password)
       formData.append("accountType", "user")
       formData.append("gender", form.gender)
       formData.append("dateOfBirth", form.dateOfBirth)
+      formData.append("nationalId", form.nationalId)
       formData.append("governorate", form.governorate)
       formData.append("city", form.city)
       formData.append("district", form.district)
@@ -78,15 +80,25 @@ function SignupForm() {
       })
       const data = await response.json()
 
-      if (!response.ok) {
-        setErrors({ form: data.message || "فشل إنشاء الحساب" })
-        addToast(data.message || "فشل إنشاء الحساب", "error")
+      if (data.status === "success") {
+        if (data.action === "verify_email") {
+          addToast("تم التسجيل بنجاح! تحقق من بريدك الإلكتروني لتفعيل الحساب", "success")
+          setTimeout(() => navigate("/verify-email"), 1000)
+        } else {
+          addToast(data.message || "تم إنشاء الحساب بنجاح!", "success")
+          setTimeout(() => navigate("/dashboard"), 1000)
+        }
       } else {
-        authLogin(data.user || data)
-        addToast("تم إنشاء الحساب بنجاح!", "success")
-        setTimeout(() => navigate("/dashboard"), 1000)
+        if (data.action === "verify_email") {
+          setErrors({ form: "هذا البريد مرتبط بحساب غير موثّق، تحقق من بريدك أو انتظر 10 دقائق ثم حاول مرة أخرى" })
+          addToast("البريد غير موثّق، تحقق من بريدك الإلكتروني", "error")
+          setTimeout(() => navigate("/verify-email"), 1000)
+        } else {
+          setErrors({ form: data.message || "فشل إنشاء الحساب" })
+          addToast(data.message || "فشل إنشاء الحساب", "error")
+        }
       }
-    } catch (error) {
+    } catch {
       setErrors({ form: "فشل الاتصال بالخادم، تحقق من اتصالك" })
       addToast("فشل الاتصال بالخادم", "error")
     } finally {
@@ -125,8 +137,10 @@ function SignupForm() {
 
       <div className="grid sm:grid-cols-2 gap-5">
         <Input label="الاسم الكامل" name="fullName" placeholder="الاسم بالكامل" value={form.fullName} onChange={handleChange} error={errors.fullName} />
-        <Input label="رقم الهاتف" name="phoneNumber" type="tel" dir="ltr" placeholder="0100 000 0000" value={form.phoneNumber} onChange={handleChange} error={errors.phoneNumber} />
+        <Input label="رقم الهاتف" name="phone" type="tel" dir="ltr" placeholder="0100 000 0000" value={form.phone} onChange={handleChange} error={errors.phone} />
       </div>
+
+      <Input label="الرقم القومي" name="nationalId" dir="ltr" placeholder="14 رقم" value={form.nationalId} onChange={handleChange} error={errors.nationalId} />
 
       <div className="grid sm:grid-cols-2 gap-5">
         <div className="flex flex-col gap-1.5 w-full">

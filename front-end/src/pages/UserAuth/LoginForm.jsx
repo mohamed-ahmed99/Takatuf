@@ -34,13 +34,18 @@ function LoginForm() {
       })
       const data = await response.json()
 
-      if (!response.ok) {
-        setErrors({ form: data.message || "فشل تسجيل الدخول" })
-        addToast(data.message || "فشل تسجيل الدخول", "error")
-      } else {
+      if (data.status === "success") {
         authLogin(data.user || data)
         addToast("تم تسجيل الدخول بنجاح!", "success")
         setTimeout(() => navigate("/dashboard"), 1000)
+      } else {
+        if (data.action === "verify_email") {
+          setErrors({ form: "البريد غير موثّق، تحقق من بريدك الإلكتروني أو انتظر 10 دقائق" })
+          addToast("البريد غير موثّق", "error")
+        } else {
+          setErrors({ form: data.message || "فشل تسجيل الدخول" })
+          addToast(data.message || "فشل تسجيل الدخول", "error")
+        }
       }
     } catch (error) {
       setErrors({ form: "فشل الاتصال بالخادم، تحقق من اتصالك" })
