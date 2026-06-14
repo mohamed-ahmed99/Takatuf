@@ -1,9 +1,6 @@
 import express from "express";
-
-const authRouter = express.Router();
-
 import { createAccount } from "../controllers/auth/createAccount.js";
-// import { Login } from "../controllers/auth/Login.js";
+import { login } from "../controllers/auth/login.js";
 
 // middleware
 import upload from "../middlewares/upload.middleware.js";
@@ -12,10 +9,14 @@ import upload from "../middlewares/upload.middleware.js";
 import { requestedFields } from "../controllers/auth/createAccount.js";
 
 
+const authRouter = express.Router();
+
+
+/////////////////// routes
 // Auth
 authRouter.post("/sign-up", upload.fields(requestedFields), createAccount);
 
-// router.post("/login", Login);
+authRouter.post("/log-in", login);
 
 
 export default authRouter;

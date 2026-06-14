@@ -162,7 +162,7 @@ export const createAccount = asyncHandler(async (req, res) => {
 
     // cookie for verify email
     const isProduction = process.env.NODE_ENV === "production";
-    res.cookie("TakaTufVerifyEmailAuth", token, {
+    res.cookie("TakatufAuth", token, {
         httpOnly: true,
         secure: isProduction,
         sameSite: "None",
@@ -176,7 +176,7 @@ export const createAccount = asyncHandler(async (req, res) => {
         token, // token
         ip: req.ip, // ip address
         userAgent: req.get("user-agent"), // user agent
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+        expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
     })
 
     // response
