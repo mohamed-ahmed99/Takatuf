@@ -34,9 +34,7 @@ export const verifyMe = asyncHandler(async (req, res) => {
     return res.status(200).json({
         status: "success",
         message: "User verified successfully",
-        data: {
-            user: userData
-        }
+        data: { ...userData }
     });
 })
 

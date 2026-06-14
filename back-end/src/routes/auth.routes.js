@@ -3,6 +3,7 @@ import { createAccount } from "../controllers/auth/createAccount.js";
 import { login } from "../controllers/auth/login.js";
 import { verifyEmail } from "../controllers/auth/verifyEmail.js";
 import { verifyMe } from "../controllers/auth/verifyToken.js";
+import { logout } from "../controllers/auth/logout.js";
 
 // middleware
 import upload from "../middlewares/upload.middleware.js";
@@ -26,7 +27,11 @@ authRouter.post("/log-in", login);
 // verify email
 authRouter.post("/verify-email", verifyToken("TakatufAuth"), verifyEmail);
 
+// verify token
 authRouter.get("/verify-token", verifyToken("TakatufAuth"), verifyMe);
+
+// log out
+authRouter.delete("/log-out", verifyToken("TakatufAuth"), logout);
 
 export default authRouter;
 

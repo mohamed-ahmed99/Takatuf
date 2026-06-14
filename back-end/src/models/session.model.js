@@ -30,7 +30,7 @@ const sessionSchema = new mongoose.Schema({
 );
 
 // session indexes
-sessionSchema.index({ user: 1 });
+sessionSchema.index({ user: 1, status: 1 });
 sessionSchema.index({ token: 1 });
 
 export default mongoose.model("Session", sessionSchema);

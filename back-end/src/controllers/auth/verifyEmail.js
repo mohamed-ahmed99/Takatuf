@@ -17,12 +17,6 @@ export const verifyEmail = asyncHandler(async (req, res) => {
         return res.status(400).json({ status: "fail", message: "Verification code is required" })
     }
 
-    // check if email exists
-    if (!email) {
-        res.clearCookie("TakatufAuth")
-        return res.status(401).json({ status: "fail", message: "Unauthorized. Email not found in session or body." })
-    }
-
     // check if user in database
     const account = await accountModel.findOne({ email }).sort({ createdAt: -1 })
     if (!account) {
@@ -31,7 +25,7 @@ export const verifyEmail = asyncHandler(async (req, res) => {
 
     // check if user is already verified
     if (account.status !== "unverified") {
-        return res.status(400).json({ status: "fail", message: "This email has already been verified." })
+        return res.status(400).json({ status: "fail", message: `This email is already ${account.status}.` })
     }
 
     // check if code is correct
@@ -80,13 +74,11 @@ export const verifyEmail = asyncHandler(async (req, res) => {
         status: "success",
         message: "Email verified successfully",
         data: {
-            user: {
-                _id: account._id,
-                email: account.email,
-                role: account.role,
-                accountType: account.accountType,
-                status: account.status
-            }
+            _id: account._id,
+            email: account.email,
+            role: account.role,
+            accountType: account.accountType,
+            status: account.status
         }
     });
 })
