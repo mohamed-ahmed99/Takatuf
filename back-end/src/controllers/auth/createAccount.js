@@ -1,15 +1,19 @@
 import asyncHandler from 'express-async-handler'
 import bcrypt from 'bcryptjs'
 import jwt from "jsonwebtoken"
-import accountModel from '../../models/account.model.js'
 import dotenv from 'dotenv'
 import emailTransporter from '../../config/emailTransporter.js'
 import { verifyEmailMSG } from '../../utils/verifyEmailMSG.js'
 import { uploadToCloudinary } from '../../utils/uploadToCloudinary.js'
-import userModel from '../../models/profiles/user.model.js'
-import charityModel from '../../models/profiles/charity.model.js'
-import charityVerificationModel from '../../models/profiles/CharityVerification.model.js'
 
+// models 
+import Sessions from "../../models/session.model.js"
+import userModel from '../../models/profiles/user.model.js'
+import charityVerificationModel from '../../models/profiles/CharityVerification.model.js'
+import charityModel from '../../models/profiles/charity.model.js'
+import accountModel from '../../models/account.model.js'
+
+// 
 dotenv.config()
 
 
@@ -22,7 +26,7 @@ export const requestedFields = [
 
 
 export const createAccount = asyncHandler(async (req, res) => {
-    
+
     // check if this email connected with an active account or not
     const account = await accountModel
         .findOne({ email: req.body.email })
@@ -167,7 +171,13 @@ export const createAccount = asyncHandler(async (req, res) => {
     });
 
     // create session
-    // await Sessions.create({ user: newAccount._id, token, ip: req.ip, expiresAt: new Date(Date.now() + 1000 * 60 * 10) })
+    await Sessions.create({ 
+        user: newAccount._id, // reference
+        token, // token
+        ip: req.ip, // ip address
+        userAgent: req.get("user-agent"), // user agent
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+    })
 
     // response
     res.status(201).json({

@@ -2,6 +2,9 @@ import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import { asyncHandler } from './asyncHandler.js'
 
+// models
+import Sessions from "../models/session.model.js"
+
 dotenv.config()
 
 
@@ -17,7 +20,7 @@ export const verifyToken = (cookieName, ...allowedRoles) => asyncHandler(async(r
     try {
         decodedToken = jwt.verify(token, process.env.JWT_SECRET)
     } catch (error) {
-        return res.status(401).json({status:"fail", message: "Invalid token" })
+        return res.status(401).json({status:"fail", message: "Invalid or expired token" })
     }
 
     // check if user has allowed role
@@ -26,23 +29,19 @@ export const verifyToken = (cookieName, ...allowedRoles) => asyncHandler(async(r
     }
 
     // check if token exist in DB
-    // const userSession = await Sessions.find({user:decodedToken._id})
-    // if(userSession.length === 0) {
-    //     return res.status(401).json({status:"fail", message: "Invalid token" })
-    // }
+    const userSession = await Sessions.findOne({token: token})
 
-    // const session = userSession.find(session => session.token === token)
-    // if(!session) {
-    //     return res.status(401).json({status:"fail", message: "Invalid token" })
-    // }
-
-    // check if token expired
-    if(session.expiresAt < Date.now()){
-        return res.status(401).json({status:"fail", message: "Token expired" })
+    // check if token is valid
+    if(!userSession) {
+        return res.status(401).json({status:"fail", message: "Invalid token" })
     }
 
+    // check if session is revoked
+    if(userSession.status === "revoked") {
+        return res.status(401).json({status:"fail", message: "Your session has been revoked" })
+    }
+    
     // attach user to request
     req.user = decodedToken
     next()
-    
 })
