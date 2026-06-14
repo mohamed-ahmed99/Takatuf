@@ -19,7 +19,7 @@ const accountSchema = new mongoose.Schema({
 
     // verification field
     verification: {
-      verificationCode: { type: String, required: true },
+      verificationCode: { type: String, default: null },
       expiresAt: { type: Date,  default: () => (Date.now() + 10 * 60 * 1000 )},
     },
 

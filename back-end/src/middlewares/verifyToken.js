@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
-import { asyncHandler } from './asyncHandler.js'
+import asyncHandler from 'express-async-handler'
 
 // models
 import Sessions from "../models/session.model.js"
