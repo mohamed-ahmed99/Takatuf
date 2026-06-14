@@ -3,9 +3,15 @@ import { useNavigate } from "react-router-dom"
 import AuthNavbar from "../../components/AuthNavbar"
 import Input from "../../components/Input"
 import Button from "../../components/Button"
+import CharitySignupForm from "./CharitySignupForm"
+import { useToast } from "../../context/ToastContext"
+import { useAuth } from "../../context/AuthContext"
 import { IconBuilding, IconSparkles, IconShield, IconUsers, IconCheckCircle } from "../../components/Icons"
 
 function CharityLoginForm() {
+  const navigate = useNavigate()
+  const { addToast } = useToast()
+  const { login: authLogin } = useAuth()
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({ email: "", password: "" })
   const [errors, setErrors] = useState({})
@@ -21,13 +27,46 @@ function CharityLoginForm() {
     if (!form.email.trim()) newErrors.email = "الإيميل مطلوب"
     if (!form.password.trim()) newErrors.password = "كلمة المرور مطلوبة"
     if (Object.keys(newErrors).length) return setErrors(newErrors)
+
     setLoading(true)
-    await new Promise((r) => setTimeout(r, 1500))
-    setLoading(false)
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/auth/log-in`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email: form.email, password: form.password }),
+      })
+      const data = await response.json()
+
+      if (data.status === "success") {
+        authLogin(data.data)
+        addToast("تم تسجيل دخول الجمعية بنجاح!", "success")
+        setTimeout(() => navigate("/dashboard"), 1000)
+      } else {
+        if (data.action === "verify_email") {
+          setErrors({ form: "حساب الجمعية غير موثق، يرجى تفعيل البريد الإلكتروني" })
+          addToast("الحساب غير موثق", "error")
+          setTimeout(() => navigate("/verify-email"), 1000)
+        } else {
+          setErrors({ form: data.message || "فشل تسجيل الدخول" })
+          addToast(data.message || "فشل تسجيل الدخول", "error")
+        }
+      }
+    } catch {
+      setErrors({ form: "فشل الاتصال بالخادم، تحقق من اتصالك" })
+      addToast("فشل الاتصال بالخادم", "error")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {errors.form && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600 text-center">
+          {errors.form}
+        </div>
+      )}
       <Input label="الإيميل الرسمي للجمعية" name="email" type="email" dir="ltr" placeholder="admin@charity.org" value={form.email} onChange={handleChange} error={errors.email} />
       <Input label="كلمة المرور" name="password" type="password" dir="ltr" placeholder="••••••••" value={form.password} onChange={handleChange} error={errors.password} />
       <div className="flex items-center justify-between text-sm">
@@ -40,58 +79,6 @@ function CharityLoginForm() {
         </a>
       </div>
       <Button type="submit" variant="primary" size="lg" loading={loading} className="w-full">دخول الجمعية</Button>
-    </form>
-  )
-}
-
-function CharitySignupForm() {
-  const [loading, setLoading] = useState(false)
-  const [form, setForm] = useState({
-    name: "", email: "", phone: "",
-    licenseNumber: "", address: "",
-    password: "", confirmPassword: "",
-  })
-  const [errors, setErrors] = useState({})
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-    if (errors[e.target.name]) setErrors({ ...errors, [e.target.name]: "" })
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    const newErrors = {}
-    if (!form.name.trim()) newErrors.name = "اسم الجمعية مطلوب"
-    if (!form.email.trim()) newErrors.email = "الإيميل مطلوب"
-    if (!form.phone.trim()) newErrors.phone = "رقم التليفون مطلوب"
-    if (!form.licenseNumber.trim()) newErrors.licenseNumber = "رقم الترخيص مطلوب"
-    if (!form.password.trim()) newErrors.password = "كلمة المرور مطلوبة"
-    if (form.password.length < 6) newErrors.password = "لازم تكون 6 حروف على الأقل"
-    if (form.password !== form.confirmPassword) newErrors.confirmPassword = "كلمتين المرور مش متطابقتين"
-    if (Object.keys(newErrors).length) return setErrors(newErrors)
-    setLoading(true)
-    await new Promise((r) => setTimeout(r, 1500))
-    setLoading(false)
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <Input label="اسم الجمعية" name="name" placeholder="اسم الجمعية الخيرية" value={form.name} onChange={handleChange} error={errors.name} />
-      <div className="grid sm:grid-cols-2 gap-5">
-        <Input label="الإيميل الرسمي" name="email" type="email" dir="ltr" placeholder="admin@charity.org" value={form.email} onChange={handleChange} error={errors.email} />
-        <Input label="رقم التليفون" name="phone" type="tel" dir="ltr" placeholder="0100 000 0000" value={form.phone} onChange={handleChange} error={errors.phone} />
-      </div>
-      <Input label="رقم الترخيص الرسمي" name="licenseNumber" placeholder="رقم ترخيص وزارة التضامن" value={form.licenseNumber} onChange={handleChange} error={errors.licenseNumber} />
-      <Input label="عنوان مقر الجمعية" name="address" placeholder="مقر الجمعية" value={form.address} onChange={handleChange} error={errors.address} />
-      <div className="grid sm:grid-cols-2 gap-5">
-        <Input label="كلمة المرور" name="password" type="password" dir="ltr" placeholder="••••••••" value={form.password} onChange={handleChange} error={errors.password} />
-        <Input label="تأكيد كلمة المرور" name="confirmPassword" type="password" dir="ltr" placeholder="••••••••" value={form.confirmPassword} onChange={handleChange} error={errors.confirmPassword} />
-      </div>
-      <div className="p-4 bg-secondary/8 rounded-2xl border border-secondary/20 text-sm text-primary-dark leading-relaxed">
-        <p className="font-bold mb-1 text-secondary-dark">ملحوظة مهمة:</p>
-        بعد التسجيل، هيتم مراجعة طلبك من فريق تكاتف والتأكد من الترخيص قبل تفعيل الحساب.
-      </div>
-      <Button type="submit" variant="primary" size="lg" loading={loading} className="w-full">سجّل الجمعية</Button>
     </form>
   )
 }
@@ -184,7 +171,7 @@ function CharityAuth() {
 
             <div className="mt-8 pt-6 border-t border-border text-center">
               <p className="text-sm text-text-muted">
-                حساب لمتبرع أو محتاج؟{" "}
+                حساب لمتبرع أو محتاج?{" "}
                 <button
                   onClick={() => navigate("/auth")}
                   className="text-secondary font-bold hover:text-secondary-dark transition-colors"

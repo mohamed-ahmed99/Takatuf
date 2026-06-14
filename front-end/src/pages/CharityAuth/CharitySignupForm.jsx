@@ -20,6 +20,12 @@ function placeholderFile() {
   return new Promise((resolve) => canvas.toBlob((b) => resolve(new File([b], 'placeholder.png', { type: 'image/png' }))))
 }
 
+function placeholderDocument() {
+  const pdfContent = "%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n2 0 obj\n<<\n/Type /Pages\n/Count 1\n/Kids [ 3 0 R ]\n>>\nendobj\n3 0 obj\n<<\n/Type /Page\n/Parent 2 0 R\n/MediaBox [ 0 0 612 792 ]\n>>\nendobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000056 00000 n \n0000000111 00000 n \ntrailer\n<<\n/Size 4\n/Root 1 0 R\n>>\nstartxref\n196\n%%EOF\n"
+  const blob = new Blob([pdfContent], { type: 'application/pdf' })
+  return new Promise((resolve) => resolve(new File([blob], 'placeholder.pdf', { type: 'application/pdf' })))
+}
+
 function CharitySignupForm() {
   const navigate = useNavigate()
   const { addToast } = useToast()
@@ -85,34 +91,40 @@ function CharitySignupForm() {
       formData.append("taxNumber", form.taxNumber)
       formData.append("profileImage", files.profileImage || await placeholderFile())
       formData.append("coverImage", files.coverImage || await placeholderFile())
-      formData.append("document", files.document || await placeholderFile())
+      formData.append("document", files.document || await placeholderDocument())
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/auth/sign-up`, {
-        method: 'POST', body: formData,
+        method: 'POST', body: formData, credentials: 'include',
       })
       const data = await response.json()
 
       if (data.status === "success") {
         if (data.action === "verify_email") {
-          addToast("تم التسجيل بنجاح! تحقق من بريدك الإلكتروني لتفعيل الحساب", "success")
-          setTimeout(() => navigate("/verify-email"), 1000)
+          addToast("تم تسجيل الجمعية بنجاح! تفقد بريدك الإلكتروني لتفعيل الحساب", "success")
+          setTimeout(() => navigate("/verify-email"), 1500)
         } else {
           addToast(data.message || "تم تسجيل الجمعية بنجاح!", "success")
           setTimeout(() => navigate("/dashboard"), 1000)
         }
       } else {
         if (data.action === "verify_email") {
-          setErrors({ form: "هذا البريد مرتبط بحساب غير موثّق، تحقق من بريدك أو انتظر 10 دقائق ثم حاول مرة أخرى" })
-          addToast("البريد غير موثّق، تحقق من بريدك الإلكتروني", "error")
-          setTimeout(() => navigate("/verify-email"), 1000)
+          setErrors({ form: "حساب الجمعية غير موثق، سيتم تحويلك لتفعيل الحساب" })
+          addToast("الحساب غير موثق", "error")
+          setTimeout(() => navigate("/verify-email"), 1500)
         } else {
-          setErrors({ form: data.message || "فشل تسجيل الجمعية" })
-          addToast(data.message || "فشل تسجيل الجمعية", "error")
+          // translate duplicate key errors to Arabic
+          let msg = data.message || "فشل تسجيل الجمعية"
+          if (msg.includes("registrationNumber")) msg = "رقم التسجيل مستخدم بالفعل، جرب رقمًا آخر"
+          else if (msg.includes("taxNumber")) msg = "الرقم الضريبي مستخدم بالفعل"
+          else if (msg.includes("email")) msg = "البريد الإلكتروني مستخدم بالفعل"
+          setErrors({ form: msg })
+          addToast(`Error From Backend: ${JSON.stringify(data)}`, "error")
         }
       }
-    } catch {
-      setErrors({ form: "فشل الاتصال بالخادم، تحقق من اتصالك" })
-      addToast("فشل الاتصال بالخادم", "error")
+    } catch (err) {
+      console.error("Signup Error:", err)
+      setErrors({ form: `إيرور السيرفر: ${err.message || "فشل الاتصال"}` })
+      addToast("حدث خطأ في السيرفر", "error")
     } finally {
       setLoading(false)
     }
@@ -120,6 +132,11 @@ function CharitySignupForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {errors.form && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600 text-center">
+          {errors.form}
+        </div>
+      )}
       <ProfileUpload
         coverImage={files.coverImage}
         profileImage={files.profileImage}

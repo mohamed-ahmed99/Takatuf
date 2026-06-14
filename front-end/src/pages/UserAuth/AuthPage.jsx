@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useSearchParams } from "react-router-dom"
+import { useSearchParams, useNavigate } from "react-router-dom"
 import AuthNavbar from "../../components/AuthNavbar"
 import SignupForm from "./SignupForm"
 import LoginForm from "./LoginForm"
@@ -15,6 +15,7 @@ const FEATURES = [
 
 function AuthPage() {
   const [searchParams, setSearchParams] = useSearchParams()
+  const navigate = useNavigate()
   const [mode, setMode] = useState(searchParams.get("tab") === "signup" ? "signup" : "login")
 
   const switchMode = (newMode) => {
@@ -111,6 +112,18 @@ function AuthPage() {
               <p className="text-xs text-text-muted text-center">
                 مجاني بالكامل · موثق بجمعيات خيرية · بدون تحويلات مالية
               </p>
+            </div>
+
+            {/* Charity CTA */}
+            <div className="mt-6 pt-5 border-t border-border">
+              <button
+                onClick={() => navigate("/auth/charity")}
+                className="w-full flex items-center justify-center gap-2.5 py-3.5 px-5 rounded-2xl border-2 border-dashed border-secondary/40 text-sm font-semibold text-primary hover:border-secondary hover:bg-secondary/5 transition-all duration-300 group"
+              >
+                <span className="text-base">🏛️</span>
+                <span>هل أنت جمعية خيرية؟ سجّل جمعيتك هنا</span>
+                <span className="text-secondary group-hover:translate-x-[-4px] transition-transform duration-300 text-base">←</span>
+              </button>
             </div>
           </div>
 

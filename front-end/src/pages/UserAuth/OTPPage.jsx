@@ -71,8 +71,6 @@ function OTPPage() {
 
     setLoading(true)
     try {
-      /* 
-      // 🚧 Backend endpoint doesn't exist yet, mocking the request
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/auth/verify-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -80,23 +78,19 @@ function OTPPage() {
         body: JSON.stringify({ code: codeStr }),
       })
       const data = await response.json()
-      */
-      
-      // Mocking successful response to bypass the 404 error
-      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
-      const data = { status: "success", user: { name: "Test User", email: "test@example.com", role: "user" } };
 
       if (data.status === "success") {
-        authLogin(data.user || data)
+        authLogin(data.data)
         addToast("تم توثيق البريد بنجاح!", "success")
         setTimeout(() => navigate("/dashboard"), 1000)
       } else {
-        addToast(data.message || "كود غير صحيح", "error")
+        addToast(`Backend Error: ${JSON.stringify(data)}`, "error")
         setCode(["", "", "", "", "", ""])
         inputRefs.current[0]?.focus()
       }
-    } catch {
-      addToast("فشل الاتصال بالخادم", "error")
+    } catch (err) {
+      console.error("OTP Error:", err)
+      addToast(`خطأ في السيرفر: ${err.message}`, "error")
     } finally {
       setLoading(false)
     }

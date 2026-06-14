@@ -27,9 +27,10 @@ function CharityLoginForm() {
 
     setLoading(true)
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/auth/login/charity`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/auth/log-in`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email: form.email, password: form.password }),
       })
       const data = await response.json()

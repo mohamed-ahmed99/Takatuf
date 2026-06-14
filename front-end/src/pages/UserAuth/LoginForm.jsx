@@ -27,15 +27,16 @@ function LoginForm() {
 
     setLoading(true)
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/auth/login`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/auth/log-in`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email: form.email, password: form.password }),
       })
       const data = await response.json()
 
       if (data.status === "success") {
-        authLogin(data.user || data)
+        authLogin(data.data)
         addToast("تم تسجيل الدخول بنجاح!", "success")
         setTimeout(() => navigate("/dashboard"), 1000)
       } else {
@@ -47,7 +48,7 @@ function LoginForm() {
           addToast(data.message || "فشل تسجيل الدخول", "error")
         }
       }
-    } catch (error) {
+    } catch {
       setErrors({ form: "فشل الاتصال بالخادم، تحقق من اتصالك" })
       addToast("فشل الاتصال بالخادم", "error")
     } finally {

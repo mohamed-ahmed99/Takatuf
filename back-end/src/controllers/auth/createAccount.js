@@ -165,7 +165,7 @@ export const createAccount = asyncHandler(async (req, res) => {
     res.cookie("TakatufAuth", token, {
         httpOnly: true,
         secure: isProduction,
-        sameSite: "None",
+        sameSite: isProduction ? "None" : "Lax",
         path: "/",
         maxAge: 10 * 60 * 1000, // 10 minutes
     });

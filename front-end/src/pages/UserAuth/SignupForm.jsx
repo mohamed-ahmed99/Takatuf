@@ -76,7 +76,7 @@ function SignupForm() {
       formData.append("coverImage", files.coverImage || await placeholderFile())
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/auth/sign-up`, {
-        method: 'POST', body: formData,
+        method: 'POST', body: formData, credentials: 'include',
       })
       const data = await response.json()
 
@@ -94,8 +94,11 @@ function SignupForm() {
           addToast("البريد غير موثّق، تحقق من بريدك الإلكتروني", "error")
           setTimeout(() => navigate("/verify-email"), 1000)
         } else {
-          setErrors({ form: data.message || "فشل إنشاء الحساب" })
-          addToast(data.message || "فشل إنشاء الحساب", "error")
+          let msg = data.message || "فشل إنشاء الحساب"
+          if (msg.includes("email")) msg = "البريد الإلكتروني مستخدم بالفعل"
+          else if (msg.includes("phoneNumber") || msg.includes("phone")) msg = "رقم الهاتف مستخدم بالفعل"
+          setErrors({ form: msg })
+          addToast(msg, "error")
         }
       }
     } catch {
