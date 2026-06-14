@@ -2,6 +2,7 @@ import express from "express";
 import { createAccount } from "../controllers/auth/createAccount.js";
 import { login } from "../controllers/auth/login.js";
 import { verifyEmail } from "../controllers/auth/verifyEmail.js";
+import { verifyMe } from "../controllers/auth/verifyToken.js";
 
 // middleware
 import upload from "../middlewares/upload.middleware.js";
@@ -24,6 +25,8 @@ authRouter.post("/log-in", login);
 
 // verify email
 authRouter.post("/verify-email", verifyToken("TakatufAuth"), verifyEmail);
+
+authRouter.get("/verify-token", verifyToken("TakatufAuth"), verifyMe);
 
 export default authRouter;
 

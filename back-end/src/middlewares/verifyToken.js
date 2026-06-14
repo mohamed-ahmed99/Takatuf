@@ -7,7 +7,6 @@ import Sessions from "../models/session.model.js"
 
 dotenv.config()
 
-
 export const verifyToken = (cookieName, ...allowedRoles) => asyncHandler(async(req, res, next) => {
     // get token
     const token = req.cookies[cookieName]
